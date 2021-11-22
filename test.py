@@ -14,6 +14,18 @@ from PyQt5.QtCore import pyqtSlot
 import os
 from preprocessing import *
 from PyQt5.QtWidgets import QFileDialog
+import os
+import tkinter as tk
+import cv2
+import numpy as np
+import threading
+
+from tkinter import messagebox
+from tkinter.filedialog import askopenfilename, askdirectory
+
+from PyQt5.QtWidgets import QFileDialog
+
+import json
 
 
 class Ui_MainWindow(QtWidgets.QMainWindow):
@@ -369,7 +381,14 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.btn_import.clicked.connect(lambda: self.import_params())
         self.btn_applyDil.clicked.connect(lambda: self.apply_morph("dilation"))
         self.btn_erosion.clicked.connect(lambda: self.apply_morph("erosion"))
-        
+        self.btn_gaus.clicked.connect(lambda: self.apply_gaussian_blur())
+        self.btn_appyCanny.clicked.connect(lambda: self.apply_canny_edge())
+        self.btn_threshold.clicked.connect(lambda: self.apply_threshold())
+        self.radioBtn_orig.clicked.connect(lambda: self.change_img_preview(1))
+        self.radioBtn_prep.clicked.connect(lambda: self.change_img_preview(2))
+
+
+
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
@@ -435,6 +454,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 
 
 # ********************************** FUNCTIONS FOR BUTTONS *****************************************
+
     def getFileNames(self):
         filter = 'Data File (*.jpeg *.jpg *.tif);; Picture File (*.jpeg *.jpg)'
         response = QFileDialog.getOpenFileNames(
@@ -466,12 +486,14 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.imgs_selected_text.set(f"Number of selected images: "
                                     f"{len(self.selected_imgs_paths)}")
 
-
-    def change_img_preview(self):
-        if self.img_mode_choice.get() == 1:
+#todo s radiobtns
+    def change_img_preview(self, mod):
+        if mod == 1:
             self.active_img = self.colored_img_arr
-        else:
+            cv2.imshow(self.window_name, self.active_img)
+        if mod == 2:
             self.active_img = self.adjusted_img_array
+            cv2.imshow(self.window_name, self.active_img)
 
     def undo_last_change(self):
         if self.adjusted_img_array_prev is not None:
@@ -510,6 +532,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         kernel_width = int(self.vs_deWigth.value())
         kernel_height = int(self.vs_deHeight.value())
         iterations = int(self.vs_deIter.value())
+
+
         kernel = np.ones((kernel_height, kernel_width), np.uint8)
         if morph == "erosion":
             self.filters["ero_width"].append(kernel_width)
@@ -539,8 +563,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 
     def apply_canny_edge(self):
         self.adjusted_img_array_prev = self.adjusted_img_array
-        threshold1 = int(self.canny_thrsh1_scl.get())
-        threshold2 = int(self.canny_thrsh2_scl.get())
+        threshold1 = int(self.vs_ceTh1.value())
+        threshold2 = int(self.vs_ceTh2.value())
         self.filters["ce_th1"].append(threshold1)
         self.filters["ce_th2"].append(threshold2)
         canny_fn = lambda img_array: cv2.Canny(img_array,
@@ -549,7 +573,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.used_filters['last'] = self.used_filters['current'].copy()
         self.used_filters['current'].append(canny_fn)
         self.update_img()
-        self.img_mode_choice.set(2)
+       # self.img_mode_choice.set(2)
 
     def apply_threshold(self):
         # THRESH_BINARY = 0
@@ -560,45 +584,46 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         # THRESH_OTSU = 8
         # THRESH_TRIANGLE = 16
         self.adjusted_img_array_prev = self.adjusted_img_array
-        at_type = self.at_type_cb.current()
-        self.filters["it_type"].append(at_type)
-        # todo pozriet return type self.at_method_cb
-        self.filters["it_method"].append(self.at_method_cb.get())
-        self.filters["it_max"].append(int(self.at_max_val_scl.get()))
-        self.filters["it_th"].append(int(self.at_thrsh_val_scl.get()))
-        self.filters["it_block"].append(self.at_block_size_scl.get())
-        self.filters["it_Cv"].append(int(self.at_c_scl.get()))
+        th_type = int(self.comboBox_2.currentIndex())
+        th_method = int(self.comboBox.currentIndex())
+        self.filters["it_type"].append(th_type)
+        self.filters["it_method"].append(th_method)
+        self.filters["it_max"].append(int(self.vS_itMax.value()))
+        self.filters["it_th"].append(int(self.vS_itth.value()))
+        self.filters["it_block"].append(self.vS_itblock.value())
+        self.filters["it_Cv"].append(int(self.vS_itCval.value()))
 
-        max_value = int(self.at_max_val_scl.get())
+        max_value = int(self.vS_itMax.value())
         # otsu
-        if at_type == 5:
+        if th_type == 5:
             at_type = 8
         # triangle
-        elif at_type == 6:
+        elif th_type == 6:
             at_type = 16
         # if pixel has higher than threshold value = pixel will be 255 (white)
-        if at_type == 0 or at_type == 1:
+        if th_type == 0 or th_type == 1:
             at_fn = lambda img_array: \
                 cv2.adaptiveThreshold(img_array, max_value,
-                                      self.at_method_cb.current(), at_type,
-                                      int(self.at_block_size_scl.get()),
-                                      int(self.at_c_scl.get()))
+                                      th_method, th_type,
+                                      int(self.vS_itblock.value()),
+                                      int(self.vS_itCval.value()))
             self.adjusted_img_array = at_fn(self.adjusted_img_array)
         else:
             at_fn = lambda img_array: \
-                cv2.threshold(img_array, int(self.at_thrsh_val_scl.get()),
-                              max_value, cv2.THRESH_BINARY + at_type)
+                cv2.threshold(img_array, int(self.vS_itth.value()),
+                              max_value, cv2.THRESH_BINARY + th_type)
             th, self.adjusted_img_array = at_fn(self.adjusted_img_array)
         self.update_img()
         self.used_filters['last'] = self.used_filters['current'].copy()
         self.used_filters['current'].append(at_fn)
-        self.img_mode_choice.set(2)
+        #self.img_mode_choice.set(2)
+        cv2.imshow(self.window_name, self.active_img)
 
     def apply_gaussian_blur(self):
         self.adjusted_img_array_prev = self.adjusted_img_array
-        kernel_width = int(self.gb_kwidth_scl.get())
-        kernel_height = int(self.gb_kheight_scl.get())
-        sigma = int(self.gb_sigma_scl.get())
+        kernel_width = int(self.vslid_gbwidth.value())
+        kernel_height = int(self.vS_gbheight.value())
+        sigma = int(self.vS_gbsigma.value())
         self.filters["gb_width"].append(kernel_width)
         self.filters["gb_height"].append(kernel_height)
         self.filters["gb_sigma"].append(sigma)
@@ -609,7 +634,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.used_filters['last'] = self.used_filters['current'].copy()
         self.used_filters['current'].append(gb_fn)
         self.update_img()
-        self.img_mode_choice.set(2)
+        cv2.imshow(self.window_name, self.active_img)
+        #self.img_mode_choice.set(2)
 
     def import_params(self):
         path = QFileDialog.getOpenFileName(
@@ -617,7 +643,6 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             caption='Select a data file',
             directory=os.getcwd(),
         )
-        #todo neviem otvorit ten subor vzbratz cez path
         path = path[0]
         with open(path) as f:
             self.json_filters = json.load(f)
