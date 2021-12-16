@@ -21,6 +21,7 @@ def adaptive_threshold(img, thresh_type, window_size, constnt):
         ret_val = (diff < constnt) * 0.0 + 255.0 * (diff > constnt)
     ret_val = 255.0 - ret_val
     ret_val = af.image.color_space(ret_val, af.CSPACE.RGB, af.CSPACE.GRAY)
+    af.image.save_image(ret_val, "PREPROCESSED.jpg")
     return ret_val
 
 def adaptive_canny(img, threshold):
@@ -29,34 +30,11 @@ def adaptive_canny(img, threshold):
     img = af.cast(img, af.Dtype.u8)
     img = af.image.color_space(img, af.CSPACE.RGB, af.CSPACE.GRAY)
     return img
-def adaptive_gaussian(img, kernel_rows, kernel_cols):#add kernel size to code
-    af.image.save_image(img, 'gnew.png')
+def adaptive_gaussian(img, kernel_rows, kernel_cols):
     img = af.image.color_space(img, af.CSPACE.GRAY, af.CSPACE.RGB)
 
     kernel = af.image.gaussian_kernel(kernel_rows, kernel_cols)
     img = af.signal.convolve2(img, kernel)
 
     img = af.image.color_space(img, af.CSPACE.RGB, af.CSPACE.GRAY)
-    af.image.save_image(img, 'gaussian.png')
     return img
-
-'''
-af.set_backend('cpu')
-print(af.info_str())
-img = af.image.load_image('text.jpg', True)
-img = adaptive_gaussian(img)
-af.image.save_image(img, 'out.png')
-
-
-
-img = af.image.load_image('dog.jpg', True)
-img = adaptive_canny(img, 0)
-af.image.save_image(img, 'out.png')
-
-
-
-
-dog_img = af.image.load_image('dog.png', True)
-out = adaptive_threshold(dog_img, 0, 13, 7)
-out = af.cast(out, af.Dtype.f32)
-af.image.save_image(out, 'out.png')'''
