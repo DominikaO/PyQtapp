@@ -210,7 +210,7 @@ def apply_gaussian_blur(self):
     self.adjusted_img_array_prev = self.adjusted_img_array
     kernel_width = int(self.vs_gb_width.value())
     kernel_height = int(self.vs_gb_height.value())
-    sigma = int(self.vs_gb_sigma.value())
+    sigma = 0
     self.filters2[str(self.counter)] = {"gaussian blur": {"width": kernel_width, "height": kernel_height,
                                                           "sigma": sigma}}
     self.filters["gb_width"][str(self.counter)] = kernel_width

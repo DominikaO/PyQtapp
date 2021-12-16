@@ -29,11 +29,11 @@ def adaptive_canny(img, threshold):
     img = af.cast(img, af.Dtype.u8)
     img = af.image.color_space(img, af.CSPACE.RGB, af.CSPACE.GRAY)
     return img
-def adaptive_gaussian(img, kernel_size):#add kernel size to code
+def adaptive_gaussian(img, kernel_rows, kernel_cols):#add kernel size to code
     af.image.save_image(img, 'gnew.png')
     img = af.image.color_space(img, af.CSPACE.GRAY, af.CSPACE.RGB)
 
-    kernel = af.image.gaussian_kernel(11, 11)
+    kernel = af.image.gaussian_kernel(kernel_rows, kernel_cols)
     img = af.signal.convolve2(img, kernel)
 
     img = af.image.color_space(img, af.CSPACE.RGB, af.CSPACE.GRAY)

@@ -14,7 +14,9 @@ from PyQt5.QtCore import pyqtSlot
 import os
 from preprocessing import *
 from PyQt5.QtWidgets import QFileDialog, QVBoxLayout, QLabel, QListWidgetItem, QListWidget
-
+import arrayfire as af
+import filters_arrayfire as at
+import numpy as np
 
 class Ui_MainWindow(QtWidgets.QMainWindow):
     def __init__(self, parent=None):
@@ -124,18 +126,18 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.label_3.setMaximumSize(QtCore.QSize(16777215, 25))
         self.label_3.setObjectName("label_3")
         self.gridLayout.addWidget(self.label_3, 3, 2, 1, 1)
-        self.vs_gb_sigma = QtWidgets.QSlider(self.gridLayoutWidget)
+        '''self.vs_gb_sigma = QtWidgets.QSlider(self.gridLayoutWidget)
         self.vs_gb_sigma.setMaximumSize(QtCore.QSize(15, 150))
         self.vs_gb_sigma.setMaximum(20)
         self.vs_gb_sigma.setOrientation(QtCore.Qt.Vertical)
         self.vs_gb_sigma.setObjectName("vs_gb_sigma")
-        self.gridLayout.addWidget(self.vs_gb_sigma, 4, 4, 1, 1)
+        self.gridLayout.addWidget(self.vs_gb_sigma, 4, 4, 1, 1)'''
         self.label_7 = QtWidgets.QLabel(self.gridLayoutWidget)
         self.label_7.setObjectName("label_7")
         self.gridLayout.addWidget(self.label_7, 4, 1, 1, 1)
-        self.label_9 = QtWidgets.QLabel(self.gridLayoutWidget)
+        '''self.label_9 = QtWidgets.QLabel(self.gridLayoutWidget)
         self.label_9.setObjectName("label_9")
-        self.gridLayout.addWidget(self.label_9, 4, 5, 1, 1)
+        self.gridLayout.addWidget(self.label_9, 4, 5, 1, 1)'''
         self.vs_gb_width = QtWidgets.QSlider(self.gridLayoutWidget)
         self.vs_gb_width.setMaximumSize(QtCore.QSize(15, 150))
         self.vs_gb_width.setMaximum(15)
@@ -167,11 +169,11 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.comboBox_method.addItem("")
         self.comboBox_method.addItem("")
         self.comboBox_method.addItem("")
-        self.comboBox_type = QtWidgets.QComboBox(self.groupBox_2)
+        '''self.comboBox_type = QtWidgets.QComboBox(self.groupBox_2)
         self.comboBox_type.setGeometry(QtCore.QRect(220, 20, 111, 21))
         self.comboBox_type.setObjectName("comboBox_type")
         self.comboBox_type.addItem("")
-        self.comboBox_type.addItem("")
+        self.comboBox_type.addItem("")'''
         self.label_4 = QtWidgets.QLabel(self.groupBox_2)
         self.label_4.setGeometry(QtCore.QRect(10, 20, 51, 21))
         self.label_4.setObjectName("label_4")
@@ -192,24 +194,24 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.label_13 = QtWidgets.QLabel(self.gridLayoutWidget_2)
         self.label_13.setObjectName("label_13")
         self.gridLayout_2.addWidget(self.label_13, 1, 5, 1, 1)
-        self.vs_it_threshold = QtWidgets.QSlider(self.gridLayoutWidget_2)
+        '''self.vs_it_threshold = QtWidgets.QSlider(self.gridLayoutWidget_2)
         self.vs_it_threshold.setMinimum(1)
         self.vs_it_threshold.setMaximum(255)
         self.vs_it_threshold.setOrientation(QtCore.Qt.Vertical)
         self.vs_it_threshold.setObjectName("vs_it_threshold")
-        self.gridLayout_2.addWidget(self.vs_it_threshold, 1, 2, 1, 1)
+        self.gridLayout_2.addWidget(self.vs_it_threshold, 1, 2, 1, 1)'''
         self.vs_it_c_value = QtWidgets.QSlider(self.gridLayoutWidget_2)
         self.vs_it_c_value.setMaximum(80)
         self.vs_it_c_value.setOrientation(QtCore.Qt.Vertical)
         self.vs_it_c_value.setObjectName("vs_it_c_value")
         self.gridLayout_2.addWidget(self.vs_it_c_value, 1, 6, 1, 1)
-        self.label_12 = QtWidgets.QLabel(self.gridLayoutWidget_2)
+        '''self.label_12 = QtWidgets.QLabel(self.gridLayoutWidget_2)
         self.label_12.setObjectName("label_12")
-        self.gridLayout_2.addWidget(self.label_12, 1, 3, 1, 1)
+        self.gridLayout_2.addWidget(self.label_12, 1, 3, 1, 1)'''
         self.label_16 = QtWidgets.QLabel(self.gridLayoutWidget_2)
         self.label_16.setObjectName("label_16")
         self.gridLayout_2.addWidget(self.label_16, 0, 5, 1, 1)
-        self.vs_it_max_value = QtWidgets.QSlider(self.gridLayoutWidget_2)
+        '''self.vs_it_max_value = QtWidgets.QSlider(self.gridLayoutWidget_2)
         self.vs_it_max_value.setMinimum(1)
         self.vs_it_max_value.setMaximum(255)
         self.vs_it_max_value.setOrientation(QtCore.Qt.Vertical)
@@ -217,7 +219,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.gridLayout_2.addWidget(self.vs_it_max_value, 1, 0, 1, 1)
         self.label_11 = QtWidgets.QLabel(self.gridLayoutWidget_2)
         self.label_11.setObjectName("label_11")
-        self.gridLayout_2.addWidget(self.label_11, 1, 1, 1, 1)
+        self.gridLayout_2.addWidget(self.label_11, 1, 1, 1, 1)'''
         self.label_14 = QtWidgets.QLabel(self.gridLayoutWidget_2)
         self.label_14.setObjectName("label_14")
         self.gridLayout_2.addWidget(self.label_14, 0, 1, 1, 1)
@@ -246,18 +248,18 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.label_20.setObjectName("label_20")
         self.gridLayout_3.addWidget(self.label_20, 1, 1, 1, 1)
         self.vs_ce_threshold_1 = QtWidgets.QSlider(self.gridLayoutWidget_3)
-        self.vs_ce_threshold_1.setMaximum(500)
+        self.vs_ce_threshold_1.setMaximum(100)
         self.vs_ce_threshold_1.setOrientation(QtCore.Qt.Vertical)
         self.vs_ce_threshold_1.setObjectName("vs_ce_threshold_1")
         self.gridLayout_3.addWidget(self.vs_ce_threshold_1, 1, 0, 1, 1)
-        self.vs_ce_threshold_2 = QtWidgets.QSlider(self.gridLayoutWidget_3)
+        '''self.vs_ce_threshold_2 = QtWidgets.QSlider(self.gridLayoutWidget_3)
         self.vs_ce_threshold_2.setMaximum(500)
         self.vs_ce_threshold_2.setOrientation(QtCore.Qt.Vertical)
         self.vs_ce_threshold_2.setObjectName("vs_ce_threshold_2")
         self.gridLayout_3.addWidget(self.vs_ce_threshold_2, 1, 2, 1, 1)
         self.label_21 = QtWidgets.QLabel(self.gridLayoutWidget_3)
         self.label_21.setObjectName("label_21")
-        self.gridLayout_3.addWidget(self.label_21, 1, 3, 1, 1)
+        self.gridLayout_3.addWidget(self.label_21, 1, 3, 1, 1)'''
         self.label_22 = QtWidgets.QLabel(self.gridLayoutWidget_3)
         self.label_22.setObjectName("label_22")
         self.gridLayout_3.addWidget(self.label_22, 0, 1, 1, 1)
@@ -289,14 +291,14 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.vs_kernel_height.setOrientation(QtCore.Qt.Vertical)
         self.vs_kernel_height.setObjectName("vs_kernel_height")
         self.gridLayout_4.addWidget(self.vs_kernel_height, 1, 2, 1, 1)
-        self.vs_kernel_iterations = QtWidgets.QSlider(self.gridLayoutWidget_4)
+        '''self.vs_kernel_iterations = QtWidgets.QSlider(self.gridLayoutWidget_4)
         self.vs_kernel_iterations.setMaximum(15)
         self.vs_kernel_iterations.setOrientation(QtCore.Qt.Vertical)
         self.vs_kernel_iterations.setObjectName("vs_kernel_iterations")
         self.gridLayout_4.addWidget(self.vs_kernel_iterations, 1, 4, 1, 1)
         self.label_26 = QtWidgets.QLabel(self.gridLayoutWidget_4)
         self.label_26.setObjectName("label_26")
-        self.gridLayout_4.addWidget(self.label_26, 1, 5, 1, 1)
+        self.gridLayout_4.addWidget(self.label_26, 1, 5, 1, 1)'''
         self.label_25 = QtWidgets.QLabel(self.gridLayoutWidget_4)
         self.label_25.setObjectName("label_25")
         self.gridLayout_4.addWidget(self.label_25, 1, 3, 1, 1)
@@ -351,16 +353,16 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.retranslateUi(MainWindow)
         self.vs_gb_width.valueChanged['int'].connect(self.label_7.setNum)
         self.vs_gb_height.valueChanged['int'].connect(self.label_8.setNum)
-        self.vs_gb_sigma.valueChanged['int'].connect(self.label_9.setNum)
-        self.vs_it_max_value.valueChanged['int'].connect(self.label_11.setNum)
-        self.vs_it_threshold.valueChanged['int'].connect(self.label_12.setNum)
+        #self.vs_gb_sigma.valueChanged['int'].connect(self.label_9.setNum)
+        #self.vs_it_max_value.valueChanged['int'].connect(self.label_11.setNum)
+        #self.vs_it_threshold.valueChanged['int'].connect(self.label_12.setNum)
         self.vs_it_block_size.valueChanged['int'].connect(self.label_13.setNum)
         self.vs_it_c_value.valueChanged['int'].connect(self.label_17.setNum)
         self.vs_ce_threshold_1.valueChanged['int'].connect(self.label_20.setNum)
-        self.vs_ce_threshold_2.valueChanged['int'].connect(self.label_21.setNum)
+        #self.vs_ce_threshold_2.valueChanged['int'].connect(self.label_21.setNum)
         self.vs_kernel_width.valueChanged['int'].connect(self.label_24.setNum)
         self.vs_kernel_height.valueChanged['int'].connect(self.label_25.setNum)
-        self.vs_kernel_iterations.valueChanged['int'].connect(self.label_26.setNum)
+        #self.vs_kernel_iterations.valueChanged['int'].connect(self.label_26.setNum)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
         # *********************** SETUP BTNS CLICKED ********************8
@@ -370,11 +372,11 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.btn_reset.clicked.connect(lambda: self.reset_image())
         self.btn_export.clicked.connect(lambda: self.export_params())
         self.btn_import.clicked.connect(lambda: self.import_params())
-        self.btn_apply_dilatation.clicked.connect(lambda: self.apply_morph("dilation",0,0,0,False))
-        self.btn_apply_erosion.clicked.connect(lambda: self.apply_morph("erosion", 0,0,0,False))
-        self.btn_apply_gaussian.clicked.connect(lambda: self.apply_gaussian_blur(0,0,0,False))
-        self.btn_apply_canny_edge.clicked.connect(lambda: self.apply_canny_edge(0,0,False))
-        self.btn_threshold.clicked.connect(lambda: self.apply_threshold(int(0), int(0), int(255),int(0) , int(0), int(0), False))
+        self.btn_apply_dilatation.clicked.connect(lambda: self.apply_morph("dilation",0,0,False))
+        self.btn_apply_erosion.clicked.connect(lambda: self.apply_morph("erosion", 0,0,False))
+        self.btn_apply_gaussian.clicked.connect(lambda: self.apply_gaussian_blur(0,0,False))
+        self.btn_apply_canny_edge.clicked.connect(lambda: self.apply_canny_edge(0,False))
+        self.btn_threshold.clicked.connect(lambda: self.apply_threshold(int(0), int(0), int(0), False))
         self.radioBtn_orig.clicked.connect(lambda: self.change_img_preview(1))
         self.radioBtn_prep.clicked.connect(lambda: self.change_img_preview(2))
         self.btn_add.clicked.connect(lambda : self.apply_selected_filter_from_import())
@@ -394,8 +396,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.label_5.setText(_translate("MainWindow", "Width"))
         self.label_3.setText(_translate("MainWindow", "Height"))
         self.label_7.setText(_translate("MainWindow", "0"))
-        self.label_9.setText(_translate("MainWindow", "0"))
-        self.label_6.setText(_translate("MainWindow", "Sigma"))
+        #self.label_9.setText(_translate("MainWindow", "0"))
+        #self.label_6.setText(_translate("MainWindow", "Sigma"))
         self.label_8.setText(_translate("MainWindow", "0"))
         self.label_19.setText(_translate("MainWindow", "Kernel"))
         self.btn_apply_gaussian.setText(_translate("MainWindow", "Apply Gaussian Blur"))
@@ -403,36 +405,36 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.comboBox_method.setItemText(0, _translate("MainWindow", "Binary Inverse"))
         self.comboBox_method.setItemText(1, _translate("MainWindow", "Binary"))
         self.comboBox_method.setItemText(2, _translate("MainWindow", "Trunc"))
-        self.comboBox_method.setItemText(3, _translate("MainWindow", "To Zero"))
+        '''self.comboBox_method.setItemText(3, _translate("MainWindow", "To Zero"))
         self.comboBox_method.setItemText(4, _translate("MainWindow", "To Zero Inverse"))
         self.comboBox_method.setItemText(5, _translate("MainWindow", "Otsu"))
         self.comboBox_method.setItemText(6, _translate("MainWindow", "Triangle"))
         self.comboBox_type.setItemText(0, _translate("MainWindow", "Gausian C"))
-        self.comboBox_type.setItemText(1, _translate("MainWindow", "Mean C"))
+        self.comboBox_type.setItemText(1, _translate("MainWindow", "Mean C"))'''
         self.label_4.setText(_translate("MainWindow", "Method :"))
-        self.label_10.setText(_translate("MainWindow", "Type :"))
+        #self.label_10.setText(_translate("MainWindow", "Type :"))
         self.label_13.setText(_translate("MainWindow", "0"))
-        self.label_12.setText(_translate("MainWindow", "0"))
+        #self.label_12.setText(_translate("MainWindow", "0"))
         self.label_16.setText(_translate("MainWindow", "Block size"))
-        self.label_11.setText(_translate("MainWindow", "0"))
-        self.label_14.setText(_translate("MainWindow", "Max value"))
-        self.label_15.setText(_translate("MainWindow", "Threshold"))
+        #self.label_11.setText(_translate("MainWindow", "0"))
+        #self.label_14.setText(_translate("MainWindow", "Max value"))
+        #self.label_15.setText(_translate("MainWindow", "Threshold"))
         self.label_17.setText(_translate("MainWindow", "0"))
         self.label_18.setText(_translate("MainWindow", "C value"))
         self.btn_threshold.setText(_translate("MainWindow", "Apply Thresholding"))
         self.groupBox_3.setTitle(_translate("MainWindow", "Canny Edge"))
         self.label_20.setText(_translate("MainWindow", "0"))
-        self.label_21.setText(_translate("MainWindow", "0"))
+        #self.label_21.setText(_translate("MainWindow", "0"))
         self.label_22.setText(_translate("MainWindow", "Threshold 1"))
-        self.label_23.setText(_translate("MainWindow", "Threshold 2"))
+        #self.label_23.setText(_translate("MainWindow", "Threshold 2"))
         self.btn_apply_canny_edge.setText(_translate("MainWindow", "Apply canny "))
         self.groupBox_4.setTitle(_translate("MainWindow", "Dilate / Erode"))
         self.label_24.setText(_translate("MainWindow", "1"))
-        self.label_26.setText(_translate("MainWindow", "1"))
+        #self.label_26.setText(_translate("MainWindow", "1"))
         self.label_25.setText(_translate("MainWindow", "1"))
         self.label_27.setText(_translate("MainWindow", "Width"))
         self.label_28.setText(_translate("MainWindow", "Height"))
-        self.label_29.setText(_translate("MainWindow", "Iterations"))
+        #self.label_29.setText(_translate("MainWindow", "Iterations"))
         self.btn_apply_dilatation.setText(_translate("MainWindow", "Apply Dilatation"))
         self.btn_apply_erosion.setText(_translate("MainWindow", "Apply Erosion"))
         self.label_30.setText(_translate("MainWindow", "Kernel"))
@@ -515,27 +517,29 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.used_filters['last'] = self.used_filters['current'].copy()
         self.used_filters['current'].append(grayscale_fn)
 
-    def apply_morph(self, morph, width, height, iterations, imported):
+    def apply_morph(self, morph, width, height, imported):
         self.adjusted_img_array_prev = self.adjusted_img_array
         if (imported == True):
             kernel_width = width
             kernel_height = height
-            iterations = iterations
+            iterations = 0
         else:
             kernel_width = int(self.vs_kernel_width.value())
             kernel_height = int(self.vs_kernel_height.value())
-            iterations = int(self.vs_kernel_iterations.value())
+            iterations = 0
 
-        kernel = np.ones((kernel_height, kernel_width), np.uint8)
+        #kernel = np.ones((kernel_height, kernel_width), np.uint8)
+        kernel = af.np_to_af_array(np.ones((kernel_height, kernel_width), np.uint8))
         if morph == "erosion":
             self.filters2[str(self.counter)] = {"erosion": {"width": kernel_width, "height": kernel_height,
                                                 "iterations": iterations}}
             self.filters.get("ero_width")[str(self.counter)] = kernel_width
             self.filters.get("ero_height")[str(self.counter)] = kernel_height
-            self.filters.get("ero_iterations")[str(self.counter)] = iterations
+            #self.filters.get("ero_iterations")[str(self.counter)] = iterations
             erosion_fn = lambda img_array: \
-                cv2.erode(img_array, kernel, iterations=iterations)
-            self.adjusted_img_array = erosion_fn(self.adjusted_img_array)
+                af.image.erode(img_array, kernel)
+            #self.adjusted_img_array = erosion_fn(self.adjusted_img_array)
+            self.adjusted_img_array = af.Array.to_ndarray(erosion_fn(af.np_to_af_array(self.adjusted_img_array)))
             self.used_filters['last'] = self.used_filters['current'].copy()
             self.used_filters['current'].append(erosion_fn)
         elif morph == "dilation":
@@ -543,10 +547,11 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
                                                              "iterations": iterations}}
             self.filters.get("dil_width")[str(self.counter)]=kernel_width
             self.filters.get("dil_height")[str(self.counter)]=kernel_height
-            self.filters.get("dil_iterations")[str(self.counter)]=iterations
+            #self.filters.get("dil_iterations")[str(self.counter)]=iterations
             dilation_fn = lambda img_array: \
-                cv2.dilate(img_array, kernel, iterations=iterations)
-            self.adjusted_img_array = dilation_fn(self.adjusted_img_array)
+                af.image.dilate(img_array, mask=kernel)
+            #self.adjusted_img_array = dilation_fn(self.adjusted_img_array)
+            self.adjusted_img_array = af.Array.to_ndarray(dilation_fn(af.np_to_af_array(self.adjusted_img_array)))
             self.used_filters['last'] = self.used_filters['current'].copy()
             self.used_filters['current'].append(dilation_fn)
         self.update_img()
@@ -557,17 +562,21 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
     def update_img(self):
         self.active_img = self.adjusted_img_array
 
-    def apply_canny_edge(self, threshold1, threshold2, imported):
+    def apply_canny_edge(self, threshold1, imported):
         self.adjusted_img_array_prev = self.adjusted_img_array
         if not imported:
             threshold1 = int(self.vs_ce_threshold_1.value())
-            threshold2 = int(self.vs_ce_threshold_2.value())
+            threshold2 = 0#int(self.vs_ce_threshold_2.value())
         self.filters2[self.counter] = {"canny edge": {"threshold 1": threshold1, "threshold 2": threshold2}}
         self.filters.get("ce_threshold_1")[str(self.counter)] = threshold1
         self.filters.get("ce_threshold_2")[str(self.counter)] = threshold2
         # self.filters["ce_th2"].append(threshold2)
         canny_fn = lambda img_array: cv2.Canny(img_array, threshold1, threshold2)
-        self.adjusted_img_array = canny_fn(self.adjusted_img_array)
+        cv2.imwrite('save.jpg', self.adjusted_img_array)
+        af_img = af.image.load_image('save.jpg', True)
+        im = at.adaptive_canny(af_img, threshold1/100)
+        af.image.save_image(im, 'save.jpg')
+        self.adjusted_img_array = cv2.imread('save.jpg', 1)
         self.used_filters['last'] = self.used_filters['current'].copy()
         self.used_filters['current'].append(canny_fn)
         self.update_img()
@@ -576,20 +585,16 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         # todo mode_choice
         # self.img_mode_choice.set(2)
 
-    def apply_threshold(self, th_type, th_method, it_max_value, it_threshold, it_block_size, it_c_value, imported):
+    def apply_threshold(self, th_method, it_block_size, it_c_value, imported):
         # THRESH_BINARY = 0
         # THRESH_BINARY_INV = 1
         # THRESH_TRUNC = 2
-        # THRESH_TOZERO = 3
-        # THRESH_TOZERO_INV = 4
-        # THRESH_OTSU = 8
-        # THRESH_TRIANGLE = 16
         self.adjusted_img_array_prev = self.adjusted_img_array
         if not imported:
-            th_type = int(self.comboBox_method.currentIndex())
-            th_method = int(self.comboBox_type.currentIndex())
-            it_max_value = int(self.vs_it_max_value.value())
-            it_threshold = int(self.vs_it_threshold.value())
+            th_method = int(self.comboBox_method.currentIndex())
+            th_type = 0
+            it_max_value = 0
+            it_threshold = 0
             it_block_size = int(self.vs_it_block_size.value())
             it_c_value = int(self.vs_it_c_value.value())
         self.filters2[self.counter] = {"image thresholding": {"type": th_type, "method": th_method,
@@ -597,13 +602,18 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
                                                               "threshold": it_threshold,
                                                               "block size": it_block_size,
                                                               "c value": it_c_value}}
-        self.filters["it_type"][str(self.counter)] = th_type
+        #self.filters["it_type"][str(self.counter)] = th_type
         self.filters["it_method"][str(self.counter)] = th_method
-        self.filters["it_max_value"][str(self.counter)] = it_max_value
-        self.filters["it_threshold"][str(self.counter)] = it_threshold
+        #self.filters["it_max_value"][str(self.counter)] = it_max_value
+        #self.filters["it_threshold"][str(self.counter)] = it_threshold
         self.filters["it_block_size"][str(self.counter)] = it_block_size
         self.filters["it_c_value"][str(self.counter)] = it_c_value
         max_value = int(self.vs_it_max_value.value())
+        af.set_backend('cpu') #todo it can be deleted but macs openCL doesnt support doubles
+        cv2.imwrite('save.jpg', self.adjusted_img_array)
+        af_img = af.image.load_image('save.jpg', True)
+        im = at.adaptive_threshold(af_img, th_type, it_block_size, it_c_value)
+        self.adjusted_img_array = af.Array.to_ndarray(im)
         # otsu
         if th_type == 5:
             th_type = 8
@@ -617,12 +627,12 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
                                       th_method, th_type,
                                       it_block_size,
                                       it_c_value)
-            self.adjusted_img_array = at_fn(self.adjusted_img_array)
+            #self.adjusted_img_array = at_fn(self.adjusted_img_array)
         else:
             at_fn = lambda img_array: \
                 cv2.threshold(img_array, int(self.vs_it_threshold.value()),
                               it_max_value, cv2.THRESH_BINARY + th_type)
-            th, self.adjusted_img_array = at_fn(self.adjusted_img_array)
+            #th, self.adjusted_img_array = at_fn(self.adjusted_img_array)
         self.update_img()
         self.used_filters['last'] = self.used_filters['current'].copy()
         self.used_filters['current'].append(at_fn)
@@ -630,16 +640,16 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         cv2.imshow(self.window_name, self.active_img)
         self.counter += 1
 
-    def apply_gaussian_blur(self, width, height, sigma, imported):
+    def apply_gaussian_blur(self, width, height, imported):
         self.adjusted_img_array_prev = self.adjusted_img_array
         if (imported == True):
             kernel_width = width
             kernel_height = height
-            sigma = sigma
+            sigma = 0
         else:
             kernel_width = int(self.vs_gb_width.value())
             kernel_height = int(self.vs_gb_height.value())
-            sigma = int(self.vs_gb_sigma.value())
+            sigma = 0
         self.filters2[str(self.counter)] = {"gaussian blur": {"width": kernel_width, "height": kernel_height,
                                                                   "sigma": sigma}}
         self.filters["gb_width"][str(self.counter)] = kernel_width
@@ -647,7 +657,12 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.filters["gb_sigma"][str(self.counter)] = sigma
         gb_fn = lambda img_array: \
             cv2.GaussianBlur(img_array, (kernel_width, kernel_height), sigma)
-        self.adjusted_img_array = gb_fn(self.adjusted_img_array)
+        #self.adjusted_img_array = gb_fn(self.adjusted_img_array)
+        cv2.imwrite('save.jpg', self.adjusted_img_array)
+        af_img = af.image.load_image('save.jpg', True)
+        im = at.adaptive_gaussian(af_img, kernel_height, kernel_width)
+        af.image.save_image(im, 'save.jpg')
+        self.adjusted_img_array = cv2.imread('save.jpg', 1)
         self.used_filters['last'] = self.used_filters['current'].copy()
         self.used_filters['current'].append(gb_fn)
         self.update_img()
