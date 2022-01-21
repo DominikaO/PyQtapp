@@ -14,7 +14,7 @@ from PyQt5.QtCore import pyqtSlot
 import os
 from preprocessing import *
 from PyQt5.QtWidgets import QFileDialog, QVBoxLayout, QLabel, QListWidgetItem, QListWidget
-
+import arrayfire as af
 
 class Ui_MainWindow(QtWidgets.QMainWindow):
     def __init__(self, parent=None):
@@ -379,7 +379,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.radioBtn_prep.clicked.connect(lambda: self.change_img_preview(2))
         self.btn_add.clicked.connect(lambda : self.apply_selected_filter_from_import())
 
-    def retranslateUi(self, MainWindow):
+    def retranslateUi(self, MainWindow):  
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
         self.btn_select_imgs.setText(_translate("MainWindow", "Select images"))
@@ -437,7 +437,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.btn_apply_erosion.setText(_translate("MainWindow", "Apply Erosion"))
         self.label_30.setText(_translate("MainWindow", "Kernel"))
         self.btn_export.setText(_translate("MainWindow", "EXPORT PARAMS"))
-        self.btn_add.setText(_translate("MainWindow", "APPLY / ADD SELECTED FILTER"))
+        self.btn_add.setText(_translate("MainWindow", "APPLY /"
+                                                      " ADD SELECTED FILTER"))
         self.btn_import.setText(_translate("MainWindow", "IMPORT PARAMS"))
         self.menuPreprocessing_app.setTitle(_translate("MainWindow", "Preprocessing app"))
 
